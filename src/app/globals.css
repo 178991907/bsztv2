@@ -85,56 +85,79 @@
     display: block !important;
   }
   
+  /* 清理外层页面的 margin 与 padding，防止其溢出产生多余分页 */
+  .character-pages {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* 强制重置 Tailwind 的 space-y-8 兄弟间距选择器，避免产生额外边距 */
+  .character-pages > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0 !important;
+  }
+  
   .character-page {
-    page-break-after: always;
-    page-break-inside: avoid;
-    min-height: 100vh;
+    width: 100% !important;
+    height: auto !important; /* 彻底自适应内容，绝不写死高度，杜绝因物理边距导致溢出产生空白页 */
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
     background: white !important;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: visible !important;
   }
   
   .character-page:last-child {
-    page-break-after: auto;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
   
+  /* 页眉和页脚在打印时改为标准的 Flex 流定位，防止大字帖在定位溢出时发生遮挡与空白页 */
   .page-header {
+    position: static !important;
     display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 0 2mm 0 !important; /* 与 @page 的 10mm 物理边距完美呼应 */
     border-bottom: 1px solid #d1d5db !important;
     background: white !important;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 2mm 5mm;
-    min-height: 8mm;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
+    min-height: 8mm !important;
   }
   
   .page-content {
-    flex: 1;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 4mm 0 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
     background: white !important;
-    display: flex;
-    flex-direction: column;
   }
   
   .page-footer {
+    position: static !important;
     display: block !important;
+    width: 100% !important;
+    padding: 2mm 0 0 0 !important;
     border-top: 1px solid #d1d5db !important;
     background: white !important;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
-    margin-top: auto;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 2mm 5mm;
-    min-height: 6mm;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
+    min-height: 6mm !important;
+    margin-top: auto !important; /* 弹性贴底：内容少时自动靠到底部，超长时自适应，绝不发生溢出 */
   }
 
   .tracing-char {
@@ -151,14 +174,9 @@
   
   /* 确保拼音四线格在打印时可见 - 仅针对线条 (h-px) */
   .h-8 > div.h-px[class*="absolute"] {
-    background-color: #9ca3af !important; /* gray-400 for better visibility but not too dark */
+    background-color: #9ca3af !important; /* gray-400 */
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
-  }
-  
-  /* 非打印元素隐藏 */
-  .no-print {
-    display: none !important;
   }
   
   /* 主内容区域在打印时占满页面 */
@@ -170,64 +188,7 @@
 
 @page {
   size: A4;
-  margin: 0;
-}
-
-/* A4纸张尺寸控制 */
-@media print {
-  .character-pages {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .character-pages > * + * {
-    margin-top: 0 !important;
-  }
-  
-  .character-page {
-    width: 100%;
-    /* 避免使用绝对 297mm 导致微小误差溢出产生空白页，改用 100vh 配合 page-break */
-    height: 100vh;
-    padding: 0;
-    box-sizing: border-box;
-    margin: 0 !important;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    page-break-after: always;
-    page-break-inside: avoid;
-    overflow: hidden;
-  }
-  
-  .character-page:last-child {
-    page-break-after: auto;
-  }
-  
-  .page-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 2mm 5mm;
-    min-height: 8mm;
-    box-sizing: border-box;
-  }
-  
-  .page-content {
-    margin-top: 10mm;
-    margin-bottom: 10mm;
-    padding: 0 5mm;
-    min-height: calc(297mm - 20mm);
-  }
-  
-  .page-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 2mm 5mm;
-    min-height: 6mm;
-    box-sizing: border-box;
-  }
+  margin: 10mm; /* A4 打印标准安全物理边距，让浏览器自动处理布局边缘，极其专业且健壮 */
 }
 
 /* 预览页面样式 */
