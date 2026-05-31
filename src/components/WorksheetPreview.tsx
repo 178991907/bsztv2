@@ -38,9 +38,14 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
       // Update state to render the specific page in the buffer
       setRenderingPageIndex(i);
 
-      // Wait for React to render the new page content and for fonts/SVGs to settle
-      // We use a multi-stage wait to be safe
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // 强力等待，确保 React 完成渲染、排版以及浏览器完成图层合成与重绘
+      await new Promise(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setTimeout(resolve, 450);
+          });
+        });
+      });
 
       if (captureBufferRef.current) {
         const success = await capturePage(captureBufferRef.current, i, totalPages);
@@ -346,7 +351,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
                 {renderingPageIndex + 1}/{pageLayout.pages.length}
               </div>
             </div>
-            <div className="page-content p-8">
+            <div className="page-content p-4 sm:p-6">
               <div className={pageLayout.pages[renderingPageIndex].length > 1 ? "space-y-6" : "space-y-2"}>
                 {pageLayout.pages[renderingPageIndex].map((char) => {
                   const data = characterDataMap.get(char);

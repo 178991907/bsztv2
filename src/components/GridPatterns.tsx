@@ -8,11 +8,10 @@ const createSharedProps = (gridColor?: string) => ({
   // 彻底抛弃使用 "currentColor"，避免在 PDF 离屏导出渲染时因为默认文本色而误解析为黑色。
   // 若未指定颜色，兜底使用轻盈的灰色 #e2e8f0，使色调优雅、柔和。
   stroke: gridColor || "#e2e8f0",
-  // 稍微提升线宽（由 1 增至 1.5），虚线尺寸拓宽为 "4 4"。
-  // 在 100x100 的视口中，这能在 html2canvas 高清缩放采样下保持完美的高保真虚线质感，不粘连不失真。
-  strokeWidth: 1.5,
+  // 线宽设定为精细的 0.8。因为去除了 vector-effect 干扰，在 100x100 的 viewBox 视口中，
+  // 这能在 html2canvas 采样解析时实现极高保真的高清虚线渲染，绝不退化变黑。
+  strokeWidth: 0.8,
   strokeDasharray: "4 4",
-  vectorEffect: "non-scaling-stroke" as const,
 });
 
 export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {

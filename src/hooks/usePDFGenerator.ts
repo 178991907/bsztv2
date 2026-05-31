@@ -48,10 +48,11 @@ export function usePDFGenerator() {
             // Prepare element for capture (ensure it looks like a printed page)
             const originalStyle = element.style.cssText;
             element.style.width = '210mm';
-            element.style.minHeight = '297mm';
+            element.style.height = '297mm'; // 强力死锁为完美的 A4 物理高度
+            element.style.overflow = 'hidden'; // 溢出隐藏，消灭任何微小的高度像素超出
             element.style.backgroundColor = '#ffffff';
             element.style.position = 'relative';
-            element.style.padding = '20px';
+            element.style.padding = '0px'; // 彻底移除 20px padding，还原内部排版可用宽度，防格子换行溢出
             element.style.boxSizing = 'border-box';
 
             const canvas = await html2canvas(element, {
@@ -96,6 +97,10 @@ export function usePDFGenerator() {
                 finalHeight = pdfHeight;
                 finalWidth = pdfHeight * canvasAspectRatio;
             }
+
+            // 引入 0.97 的防溢出安全收敛比例系数，在 A4 页面四周留出匀称透气的保护白边，双重铁壁死锁空白页
+            finalWidth = finalWidth * 0.97;
+            finalHeight = finalHeight * 0.97;
 
             // 计算完全居中的坐标位置，保证在 A4 页面上完美匀称排布
             const x = (pdf.internal.pageSize.getWidth() - finalWidth) / 2;
