@@ -175,15 +175,31 @@
 
 /* A4纸张尺寸控制 */
 @media print {
+  .character-pages {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .character-pages > * + * {
+    margin-top: 0 !important;
+  }
+  
   .character-page {
-    width: 210mm;
-    height: 297mm;
+    width: 100%;
+    /* 避免使用绝对 297mm 导致微小误差溢出产生空白页，改用 100vh 配合 page-break */
+    height: 100vh;
     padding: 0;
     box-sizing: border-box;
-    margin: 0;
+    margin: 0 !important;
     border: none;
     box-shadow: none;
     border-radius: 0;
+    page-break-after: always;
+    page-break-inside: avoid;
+    overflow: hidden;
+  }
+  
+  .character-page:last-child {
+    page-break-after: auto;
   }
   
   .page-header {
