@@ -98,8 +98,7 @@ function TracingCharacterGridComponent({
               // Mode 1: Render the full character for tracing (仅使用描字颜色)
               <path
                 d={strokes.join(' ')}
-                fill={tracingColor}          // 使用描字颜色
-                fillOpacity={0.25}           // 使用原生的 fillOpacity 透明度声明，解决 html2canvas 无法解析 8 位 hex 的兼容性大坑
+                fill={tracingColor + "40"}  // 使用描字颜色加透明度
                 className="tracing-char"
               />
             ) : isExample ? (
@@ -111,15 +110,12 @@ function TracingCharacterGridComponent({
             ) : (
               // Mode 2: Render stroke-by-stroke animation
               <>
-                {/* 笔顺分解的垫底汉字（Base character）：
-                    此处彻底弃用带透明度的描红颜色拼接，改用标准的纯实心轻柔淡灰色 #e2e8f0 渲染（完全不含透明度 fillOpacity）。
-                    这能彻底且根本地避免当用户在系统直接打印弹窗中未勾选“背景图形”时，由于打印机强制抹去透明度而将底字误渲染成 100% 纯黑色块的顽疾，
-                    同时在视觉上能产出学术级字帖最严谨的淡淡垫底双钩灰字，极其高雅精美！ */}
+                {/* Base character in light tracing color */}
                 {strokes.map((stroke, i) => (
                   <path
                     key={`base-${i}`}
                     d={stroke}
-                    fill="#e2e8f0"           // 统一使用纯实心轻柔灰色，打印机高保真友好
+                    fill={tracingColor + "20"}  // 使用描字颜色的淡版本作为底线
                   />
                 ))}
                 {/* Completed strokes - 使用完成笔顺颜色 */}

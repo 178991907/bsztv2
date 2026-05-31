@@ -45,18 +45,28 @@ export function usePDFGenerator() {
             const isLargeDocument = total > 50;
             const scale = isLargeDocument ? 1.5 : 2;
 
-            // 直接对已经完全渲染定型的高保真静态 A4 DOM 页面节点进行极速 Canvas 采样
+            // 准备捕获元素的样式（不设置 minHeight，避免产生多余的空白底部）
+            const originalStyle = element.style.cssText;
+            element.style.width = '210mm';
+            element.style.backgroundColor = '#ffffff';
+            element.style.position = 'relative';
+            element.style.padding = '20px';
+            element.style.boxSizing = 'border-box';
+
             const canvas = await html2canvas(element, {
                 scale: scale,
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: element.offsetWidth || element.scrollWidth,
-                height: element.offsetHeight || element.scrollHeight,
+                width: element.scrollWidth,
+                height: element.scrollHeight,
                 imageTimeout: 0,
                 removeContainer: true,
             });
+
+            // Restore original style
+            element.style.cssText = originalStyle;
 
             // Check if generation was aborted or pdf was cleared during async capture
             if (!pdfRef.current || abortRef.current) return false;
@@ -64,37 +74,20 @@ export function usePDFGenerator() {
             const imgData = canvas.toDataURL('image/jpeg', isLargeDocument ? 0.85 : 0.92);
 
             const pdf = pdfRef.current;
-            
-            // 定义尺寸安全收缩裕量（单位：pt），扣除 24 pt (约 8.4mm 超宽留白) 以防止 jsPDF 因为高清 scale 滚动精度判定溢出导致自动生成空白页
-            const SAFE_MARGIN = 24;
-            const pdfWidth = pdf.internal.pageSize.getWidth() - SAFE_MARGIN;
-            const pdfHeight = pdf.internal.pageSize.getHeight() - SAFE_MARGIN;
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
 
             if (index > 0) {
                 pdf.addPage();
             }
 
-            const canvasAspectRatio = canvas.width / canvas.height;
-            const pdfAspectRatio = pdfWidth / pdfHeight;
+            // 将图像宽度缩放至 PDF 页面宽度，高度按比例自适应
+            // 不再使用居中放置策略，而是从页面顶部开始，避免出现空白页
+            const finalWidth = pdfWidth;
+            const finalHeight = (canvas.height / canvas.width) * pdfWidth;
 
-            let finalWidth, finalHeight;
-            if (canvasAspectRatio > pdfAspectRatio) {
-                finalWidth = pdfWidth;
-                finalHeight = pdfWidth / canvasAspectRatio;
-            } else {
-                finalHeight = pdfHeight;
-                finalWidth = pdfHeight * canvasAspectRatio;
-            }
-
-            // 引入 0.97 的防溢出安全收敛比例系数，在 A4 页面四周留出匀称透气的保护白边，双重铁壁死锁空白页
-            finalWidth = finalWidth * 0.97;
-            finalHeight = finalHeight * 0.97;
-
-            // 计算完全居中的坐标位置，保证在 A4 页面上完美匀称排布
-            const x = (pdf.internal.pageSize.getWidth() - finalWidth) / 2;
-            const y = (pdf.internal.pageSize.getHeight() - finalHeight) / 2;
-
-            pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
+            // 从顶部开始放置图像，x = 0 水平居左对齐
+            pdf.addImage(imgData, 'JPEG', 0, 0, finalWidth, finalHeight);
 
             setProgress(prev => ({ ...prev, current: index + 1 }));
             return true;

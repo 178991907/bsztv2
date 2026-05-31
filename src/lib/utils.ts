@@ -19,8 +19,8 @@ const estimateCharacterHeight = (
   settings: Settings,
   characterDataMap: Map<string, CharacterData>
 ): number => {
-  // 1. 汉字头部高度：包含示例字、部首、结构、笔画以及间距边框等全部高保真物理占位
-  const HEADER_HEIGHT = 32;
+  // 1. 汉字头部高度：包含示例字（w-24 h-24，约为 25.4mm）、拼音及笔画数说明信息
+  const HEADER_HEIGHT = 28;
 
   // 2. 获取当前汉字的笔画数，若数据尚未载入完成，则默认兜底为 10 画
   let strokeCount = 10;
@@ -51,8 +51,8 @@ const estimateCharacterHeight = (
     }
   }
 
-  // 单个练习行的物理高度（包含格子高度、拼音高度、微调内边距和格线空间，以及 Tailwind 的 gap-1/space-y-1 物理间距开销）
-  const rowHeight = gridHeight + pinyinHeight + 2.0;
+  // 单个练习行的物理高度（包含格子高度、拼音高度、微调内边距和格线空间）
+  const rowHeight = gridHeight + pinyinHeight + 1.5;
 
   // 4. 计算该字总共需要的练习行数
   // 如果笔画数 <= 每行格子数，单次演示占 1 行，总行数等于“描字行数”
@@ -76,8 +76,8 @@ export const calculatePageLayout = (
 ): PageLayoutResult => {
   if (uniqueChars.length === 0) return { canFitInOnePage: false, pages: [] };
 
-  // 限制 A4 纸张页面最大可用高度为 250mm，在页面底端留出极其稳健安全的防火墙，杜绝任何内容被迫溢出
-  const MAX_PAGE_HEIGHT = 250;
+  // 限制 A4 纸张页面可用高度为 265mm（总高 297mm，除去页眉页脚及上下边距）
+  const MAX_PAGE_HEIGHT = 265;
   // 相邻汉字块之间的 CSS 垂直间隙物理高度（如 space-y-6 约为 6mm）
   const SPACE_GAP = 6;
 

@@ -4,22 +4,33 @@ interface GridPatternProps extends SVGProps<SVGSVGElement> {
   gridColor?: string;
 }
 
-const createSharedProps = (gridColor?: string) => ({
-  // 彻底抛弃使用 "currentColor"，避免在 PDF 离屏导出渲染时因为默认文本色而误解析为黑色。
-  // 若未指定颜色，兜底使用轻盈的灰色 #e2e8f0，使色调优雅、柔和。
-  stroke: gridColor || "#e2e8f0",
-  // 线宽设定为精细的 0.8。因为去除了 vector-effect 干扰，在 100x100 的 viewBox 视口中，
-  // 这能在 html2canvas 采样解析时实现极高保真的高清虚线渲染，绝不退化变黑。
-  strokeWidth: 0.8,
-  strokeDasharray: "4 4",
-});
+/**
+ * 创建网格线条的共享属性。
+ * 同时通过内联 style 属性保证 html2canvas 在离屏渲染（PDF 导出）时
+ * 能正确捕获虚线和颜色，而不是回退为默认的黑色实线。
+ */
+const createSharedProps = (gridColor?: string) => {
+  const color = gridColor || "#d1d5db";
+  return {
+    stroke: color,
+    strokeWidth: 1,
+    strokeDasharray: "2 2",
+    vectorEffect: "non-scaling-stroke" as const,
+    // 内联 style 确保 html2canvas 正确解析颜色和虚线
+    style: {
+      stroke: color,
+      strokeWidth: 1,
+      strokeDasharray: "2 2",
+    },
+  };
+};
 
 export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {/* 田字格：横线(M0,50 L100,50) + 竖线(M50,0 L50,100) 的单一路径整合 */}
-      <path d="M0,50 L100,50 M50,0 L50,100" {...sharedProps} fill="none" />
+      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
+      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
     </svg>
   );
 };
@@ -28,9 +39,10 @@ export const MiZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {/* 米字格：横线 + 竖线 + 对角线(M0,0 L100,100) + 反对角线(M100,0 L0,100) 的单一路径高度整合，
-          彻底解决 html2canvas 对斜线 line 元素的色彩和虚线解析退化 Bug */}
-      <path d="M0,50 L100,50 M50,0 L50,100 M0,0 L100,100 M100,0 L0,100" {...sharedProps} fill="none" />
+      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
+      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
+      <line x1="0" y1="0" x2="100" y2="100" {...sharedProps} />
+      <line x1="100" y1="0" x2="0" y2="100" {...sharedProps} />
     </svg>
   );
 };
@@ -39,9 +51,10 @@ export const HuiGongGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {/* 回宫格：外圈矩形加上内部的田字格交叉路径 */}
       <rect x="15" y="15" width="70" height="70" {...sharedProps} fill="none" />
-      <path d="M0,50 L100,50 M50,0 L50,100" {...sharedProps} fill="none" />
+      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
+      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
     </svg>
   );
 };
+
