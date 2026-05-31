@@ -46,13 +46,16 @@ export function usePDFGenerator() {
             const scale = isLargeDocument ? 1.5 : 2;
             const jpegQuality = isLargeDocument ? 0.85 : 0.92;
 
-            // 准备捕获元素样式：不设 height/minHeight，让内容自然撑开
+            // 准备捕获元素样式：强制指定 A4 物理宽高 (210mm x 297mm)，避免因负位置定位导致 html2canvas 截取到多余空白页
             const originalStyle = element.style.cssText;
             element.style.width = '210mm';
+            element.style.height = '297mm';
             element.style.backgroundColor = '#ffffff';
             element.style.boxSizing = 'border-box';
+            element.style.position = 'relative';
+            element.style.overflow = 'hidden';
 
-            // 捕获元素的自然渲染内容
+            // 捕获元素的内容
             const canvas = await html2canvas(element, {
                 scale: scale,
                 useCORS: true,

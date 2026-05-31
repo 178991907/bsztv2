@@ -335,9 +335,33 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
         </div>
       )}
 
-      <div id="capture-buffer" className="fixed left-[-9999px] top-[-9999px] no-print" style={{ width: '210mm' }}>
+      <div
+        id="capture-buffer"
+        className="no-print"
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: "210mm",
+          height: "297mm",
+          overflow: "hidden",
+          zIndex: -100,
+          opacity: 0.01,
+          pointerEvents: "none",
+        }}
+      >
         {renderingPageIndex >= 0 && pageLayout.pages[renderingPageIndex] && (
-          <div ref={captureBufferRef} className="bg-white" style={{ width: '210mm' }}>
+          <div
+            ref={captureBufferRef}
+            className="bg-white text-black"
+            style={{
+              width: "210mm",
+              height: "297mm",
+              boxSizing: "border-box",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <div className="page-header flex items-center justify-between p-2 border-b bg-background">
               <div className="flex-1 text-center">
                 <h1 className="text-2xl font-bold text-foreground">笔顺字帖</h1>
