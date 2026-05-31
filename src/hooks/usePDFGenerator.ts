@@ -41,10 +41,16 @@ export function usePDFGenerator() {
         if (!pdfRef.current || abortRef.current) return false;
 
         try {
-            // 画质设置
-            const isLargeDocument = total > 50;
-            const scale = isLargeDocument ? 1.5 : 2;
-            const jpegQuality = isLargeDocument ? 0.85 : 0.92;
+            // 画质设置：根据总页数动态调整截图分辨率，平衡清晰度与渲染性能（防止大文档极度卡顿）
+            let scale = 2; // 默认超清
+            if (total >= 50) {
+                scale = 1.0; // 超大文档使用基础分辨率
+            } else if (total >= 30) {
+                scale = 1.2;
+            } else if (total >= 15) {
+                scale = 1.5;
+            }
+            const jpegQuality = total > 30 ? 0.8 : 0.92;
 
             // 准备捕获元素样式：强制指定 A4 物理宽高 (210mm x 297mm)，避免因负位置定位导致 html2canvas 截取到多余空白页
             const originalStyle = element.style.cssText;

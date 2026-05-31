@@ -39,8 +39,8 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
       setRenderingPageIndex(i);
 
       // Wait for React to render the new page content and for fonts/SVGs to settle
-      // We use a multi-stage wait to be safe
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // We reduce this to 50ms to speed up large document generation while keeping safety margin
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       if (captureBufferRef.current) {
         const success = await capturePage(captureBufferRef.current, i, totalPages);

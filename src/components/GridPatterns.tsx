@@ -29,8 +29,8 @@ const hexToRgba = (hex: string, alpha: number): string => {
  */
 const renderHorizontalDashedLine = (y: number, color: string, strokeWidth: number) => {
   const segments = [];
-  const dashLength = 2.5;
-  const gapLength = 2.5;
+  const dashLength = 4;
+  const gapLength = 4;
   for (let x = 0; x < 100; x += dashLength + gapLength) {
     const x2 = Math.min(x + dashLength, 100);
     segments.push(
@@ -53,8 +53,8 @@ const renderHorizontalDashedLine = (y: number, color: string, strokeWidth: numbe
  */
 const renderVerticalDashedLine = (x: number, color: string, strokeWidth: number) => {
   const segments = [];
-  const dashLength = 2.5;
-  const gapLength = 2.5;
+  const dashLength = 4;
+  const gapLength = 4;
   for (let y = 0; y < 100; y += dashLength + gapLength) {
     const y2 = Math.min(y + dashLength, 100);
     segments.push(
@@ -77,8 +77,8 @@ const renderVerticalDashedLine = (x: number, color: string, strokeWidth: number)
  */
 const renderMainDiagonalDashedLine = (color: string, strokeWidth: number) => {
   const segments = [];
-  const dashLength = 2.5;
-  const gapLength = 2.5;
+  const dashLength = 4;
+  const gapLength = 4;
   const step = (dashLength + gapLength) / Math.sqrt(2);
   const dashStep = dashLength / Math.sqrt(2);
   for (let x = 0; x < 100; x += step) {
@@ -105,8 +105,8 @@ const renderMainDiagonalDashedLine = (color: string, strokeWidth: number) => {
  */
 const renderAntiDiagonalDashedLine = (color: string, strokeWidth: number) => {
   const segments = [];
-  const dashLength = 2.5;
-  const gapLength = 2.5;
+  const dashLength = 4;
+  const gapLength = 4;
   const step = (dashLength + gapLength) / Math.sqrt(2);
   const dashStep = dashLength / Math.sqrt(2);
   for (let x = 0; x < 100; x += step) {
@@ -133,8 +133,8 @@ const renderAntiDiagonalDashedLine = (color: string, strokeWidth: number) => {
  */
 const renderDashedRect = (x: number, y: number, width: number, height: number, color: string, strokeWidth: number) => {
   const segments = [];
-  const dashLength = 2.5;
-  const gapLength = 2.5;
+  const dashLength = 4;
+  const gapLength = 4;
   
   // 顶边：y
   for (let px = x; px < x + width; px += dashLength + gapLength) {
