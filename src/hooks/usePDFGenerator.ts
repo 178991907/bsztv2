@@ -45,30 +45,18 @@ export function usePDFGenerator() {
             const isLargeDocument = total > 50;
             const scale = isLargeDocument ? 1.5 : 2;
 
-            // Prepare element for capture (ensure it looks like a printed page)
-            const originalStyle = element.style.cssText;
-            element.style.width = '210mm';
-            element.style.height = '297mm'; // 强力死锁为完美的 A4 物理高度
-            element.style.overflow = 'hidden'; // 溢出隐藏，消灭任何微小的高度像素超出
-            element.style.backgroundColor = '#ffffff';
-            element.style.position = 'relative';
-            element.style.padding = '0px'; // 彻底移除 20px padding，还原内部排版可用宽度，防格子换行溢出
-            element.style.boxSizing = 'border-box';
-
+            // 直接对已经完全渲染定型的高保真静态 A4 DOM 页面节点进行极速 Canvas 采样
             const canvas = await html2canvas(element, {
                 scale: scale,
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: element.scrollWidth,
-                height: element.scrollHeight,
+                width: element.offsetWidth || element.scrollWidth,
+                height: element.offsetHeight || element.scrollHeight,
                 imageTimeout: 0,
                 removeContainer: true,
             });
-
-            // Restore original style
-            element.style.cssText = originalStyle;
 
             // Check if generation was aborted or pdf was cleared during async capture
             if (!pdfRef.current || abortRef.current) return false;

@@ -15,9 +15,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
   const { characterDataMap, isLoading: isDataLoading, loadingProgress, uniqueChars, allCharsLoaded } = useCharacterData(settings.name);
   const { isDownloading, progress: pdfProgress, startPDF, capturePage, finishPDF, previewPDF, cancelGeneration } = usePDFGenerator();
 
-  const [renderingPageIndex, setRenderingPageIndex] = useState<number>(-1);
   const [showAllInPreview, setShowAllInPreview] = useState(false);
-  const captureBufferRef = useRef<HTMLDivElement>(null);
 
   const pageLayout = useMemo(() => {
     if (uniqueChars.length === 0 || !allCharsLoaded) return { canFitInOnePage: false, pages: [] };
@@ -34,29 +32,27 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
     const totalPages = pageLayout.pages.length;
     startPDF(totalPages);
 
+    const pdfRenderArea = document.getElementById("pdf-render-area");
+    if (!pdfRenderArea) {
+      console.error("PDF render area not found");
+      return;
+    }
+
+    const pageElements = Array.from(pdfRenderArea.children) as HTMLElement[];
+
     for (let i = 0; i < totalPages; i++) {
-      // Update state to render the specific page in the buffer
-      setRenderingPageIndex(i);
-
-      // 强力等待，确保 React 完成渲染、排版以及浏览器完成图层合成与重绘
-      await new Promise(resolve => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            setTimeout(resolve, 450);
-          });
-        });
-      });
-
-      if (captureBufferRef.current) {
-        const success = await capturePage(captureBufferRef.current, i, totalPages);
+      const pageElement = pageElements[i];
+      if (pageElement) {
+        // 渲染进度稍微等待 50ms 只是为了能让用户的 UI 进度条平滑滑动，不需要任何 React 重绘等待
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
+        const success = await capturePage(pageElement, i, totalPages);
         if (!success) break;
       } else {
-        console.error("Capture buffer ref not found");
+        console.error(`Page element at index ${i} not found`);
         break;
       }
     }
-
-    setRenderingPageIndex(-1);
 
     // Generate dynamic filename: [姓名]-笔顺字帖.pdf (sanitization handled in usePDFGenerator)
     const displayName = (settings.name || "").trim() || "练习";
@@ -340,26 +336,45 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
         </div>
       )}
 
-      <div id="capture-buffer" className="fixed left-[-9999px] top-[-9999px] no-print" style={{ width: '210mm' }}>
-        {renderingPageIndex >= 0 && pageLayout.pages[renderingPageIndex] && (
-          <div ref={captureBufferRef} className="character-page bg-white">
-            <div className="page-header flex items-center justify-between p-2 border-b bg-background">
+      {/* 终极高保真 PDF 导出专用静态渲染容器：一次性在文档流中渲染所有页面，根除异步重绘时序滞后与空白页 Bug */}
+      <div id="pdf-render-area" className="no-print" style={{ position: 'absolute', left: '-9999px', top: '0', width: '210mm' }}>
+        {pageLayout.pages.map((pageChars, pageIndex) => (
+          <div 
+            key={`pdf-page-${pageIndex}`} 
+            className="character-page bg-white"
+            style={{ 
+              width: '210mm', 
+              height: '297mm', 
+              overflow: 'hidden', 
+              position: 'relative', 
+              boxSizing: 'border-box',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {/* 页眉 */}
+            <div className="page-header flex items-center justify-between p-2 border-b bg-background" style={{ minHeight: '10mm', boxSizing: 'border-box' }}>
               <div className="flex-1 text-center">
                 <h1 className="text-2xl font-bold text-foreground">笔顺字帖</h1>
               </div>
               <div className="text-right text-sm text-muted-foreground">
-                {renderingPageIndex + 1}/{pageLayout.pages.length}
+                第 {pageIndex + 1} 页/共 {pageLayout.pages.length} 页
               </div>
             </div>
-            <div className="page-content p-4 sm:p-6">
-              <div className={pageLayout.pages[renderingPageIndex].length > 1 ? "space-y-6" : "space-y-2"}>
-                {pageLayout.pages[renderingPageIndex].map((char) => {
+            
+            {/* 主内容 */}
+            <div className="page-content p-4 sm:p-6 flex-1 flex flex-col justify-start">
+              <div className={pageChars.length > 1 ? "space-y-6" : "space-y-2"}>
+                {pageChars.map((char) => {
                   const data = characterDataMap.get(char);
                   if (!data) return null;
                   const { details, strokesData } = data;
                   const strokes = strokesData?.strokes || [];
                   return (
-                    <div key={`capture-${char}`} className={pageLayout.pages[renderingPageIndex].length > 1 ? "character-section border-b border-gray-100 pb-4 last:border-b-0" : "character-section"}>
+                    <div 
+                      key={`pdf-capture-${char}`} 
+                      className={pageChars.length > 1 ? "character-section border-b border-gray-100 pb-4 last:border-b-0" : "character-section"}
+                    >
                       <div className="flex gap-4 items-center mb-2">
                         <TracingCharacterGrid
                           strokes={strokes}
@@ -383,7 +398,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
               </div>
             </div>
           </div>
-        )}
+        ))}
       </div>
 
       <div id="printable-area" className="printable-area">
