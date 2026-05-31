@@ -88,7 +88,9 @@
   .character-page {
     page-break-after: always;
     page-break-inside: avoid;
-    min-height: 100vh;
+    /* 强行死锁高度为 A4 纸高减去 1mm 安全线，并强制隐藏可能因排版精度误差产生的极微弱溢出，彻底消除直接打印时的多余空白偶数页 */
+    height: 296mm;
+    overflow: hidden;
     background: white !important;
     display: flex;
     flex-direction: column;
@@ -176,7 +178,9 @@
 @media print {
   .character-page {
     width: 210mm;
-    height: 297mm;
+    /* 统一死锁高度为 296mm，并且强制溢出隐藏，保证即使没有勾选“背景图形”时，由于任何微小边框计算变厚也不会溢出多出一页。 */
+    height: 296mm;
+    overflow: hidden;
     padding: 0;
     box-sizing: border-box;
     margin: 0;
