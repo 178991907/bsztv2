@@ -19,8 +19,8 @@ export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
-      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
+      {/* 田字格：横线(M0,50 L100,50) + 竖线(M50,0 L50,100) 的单一路径整合 */}
+      <path d="M0,50 L100,50 M50,0 L50,100" {...sharedProps} fill="none" />
     </svg>
   );
 };
@@ -29,10 +29,9 @@ export const MiZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
-      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
-      <line x1="0" y1="0" x2="100" y2="100" {...sharedProps} />
-      <line x1="100" y1="0" x2="0" y2="100" {...sharedProps} />
+      {/* 米字格：横线 + 竖线 + 对角线(M0,0 L100,100) + 反对角线(M100,0 L0,100) 的单一路径高度整合，
+          彻底解决 html2canvas 对斜线 line 元素的色彩和虚线解析退化 Bug */}
+      <path d="M0,50 L100,50 M50,0 L50,100 M0,0 L100,100 M100,0 L0,100" {...sharedProps} fill="none" />
     </svg>
   );
 };
@@ -41,9 +40,9 @@ export const HuiGongGe = ({ gridColor, ...props }: GridPatternProps) => {
   const sharedProps = createSharedProps(gridColor);
   return (
     <svg viewBox="0 0 100 100" {...props} className="grid-line">
+      {/* 回宫格：外圈矩形加上内部的田字格交叉路径 */}
       <rect x="15" y="15" width="70" height="70" {...sharedProps} fill="none" />
-      <line x1="0" y1="50" x2="100" y2="50" {...sharedProps} />
-      <line x1="50" y1="0" x2="50" y2="100" {...sharedProps} />
+      <path d="M0,50 L100,50 M50,0 L50,100" {...sharedProps} fill="none" />
     </svg>
   );
 };

@@ -76,8 +76,8 @@ export function usePDFGenerator() {
 
             const pdf = pdfRef.current;
             
-            // 定义尺寸安全收缩裕量（单位：pt），扣除 4 pt 以防止 jsPDF 因为极微弱浮点精度溢出导致自动生成空白页
-            const SAFE_MARGIN = 4;
+            // 定义尺寸安全收缩裕量（单位：pt），扣除 24 pt (约 8.4mm 超宽留白) 以防止 jsPDF 因为高清 scale 滚动精度判定溢出导致自动生成空白页
+            const SAFE_MARGIN = 24;
             const pdfWidth = pdf.internal.pageSize.getWidth() - SAFE_MARGIN;
             const pdfHeight = pdf.internal.pageSize.getHeight() - SAFE_MARGIN;
 
