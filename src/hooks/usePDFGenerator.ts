@@ -75,8 +75,11 @@ export function usePDFGenerator() {
             const imgData = canvas.toDataURL('image/jpeg', isLargeDocument ? 0.85 : 0.92);
 
             const pdf = pdfRef.current;
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+            
+            // 定义尺寸安全收缩裕量（单位：pt），扣除 4 pt 以防止 jsPDF 因为极微弱浮点精度溢出导致自动生成空白页
+            const SAFE_MARGIN = 4;
+            const pdfWidth = pdf.internal.pageSize.getWidth() - SAFE_MARGIN;
+            const pdfHeight = pdf.internal.pageSize.getHeight() - SAFE_MARGIN;
 
             if (index > 0) {
                 pdf.addPage();
@@ -94,8 +97,9 @@ export function usePDFGenerator() {
                 finalWidth = pdfHeight * canvasAspectRatio;
             }
 
-            const x = (pdfWidth - finalWidth) / 2;
-            const y = (pdfHeight - finalHeight) / 2;
+            // 计算完全居中的坐标位置，保证在 A4 页面上完美匀称排布
+            const x = (pdf.internal.pageSize.getWidth() - finalWidth) / 2;
+            const y = (pdf.internal.pageSize.getHeight() - finalHeight) / 2;
 
             pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
 

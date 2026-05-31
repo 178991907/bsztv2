@@ -144,7 +144,6 @@
   }
   
   .grid-line {
-    stroke: #d1d5db !important; /* gray-300 */
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
