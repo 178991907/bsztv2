@@ -453,11 +453,26 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
           </div>
         ) : (
           <div className="character-page">
-            <div className="flex items-center justify-center h-96 text-muted-foreground">
-              {uniqueChars.length === 0 ?
-                "请在左侧输入汉字以生成字帖" :
-                "正在加载汉字数据..."
-              }
+            <div className="flex flex-col items-center justify-center h-96 text-muted-foreground p-8">
+              {uniqueChars.length === 0 ? (
+                <span className="text-lg">请在左侧输入汉字以生成字帖</span>
+              ) : (
+                <div className="flex flex-col items-center gap-4 animate-in fade-in zoom-in duration-300">
+                  <div className="relative">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-2.5 w-2.5 bg-primary rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <span className="text-lg font-bold text-foreground animate-pulse">正在为您采集并渲染字帖数据...</span>
+                    <span className="text-xs text-muted-foreground bg-secondary/80 px-4 py-1.5 rounded-full border border-dashed shadow-inner">
+                      已加载 {loadingProgress.loaded} / {loadingProgress.total} 字 ( {loadingPercent}% )
+                    </span>
+                  </div>
+                  <Progress value={loadingPercent} className="w-64 h-2 mt-2 shadow-inner bg-secondary border" />
+                </div>
+              )}
             </div>
           </div>
         )}
