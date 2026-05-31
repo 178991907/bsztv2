@@ -41,37 +41,68 @@ export function usePDFGenerator() {
         if (!pdfRef.current || abortRef.current) return false;
 
         try {
-            // Quality settings for capture
+            // 画质设置
             const isLargeDocument = total > 50;
             const scale = isLargeDocument ? 1.5 : 2;
+            const jpegQuality = isLargeDocument ? 0.85 : 0.92;
 
-            // 准备捕获元素的样式（不设置 minHeight，避免产生多余的空白底部）
+            // 准备捕获元素样式：不设 height/minHeight，让内容自然撑开
             const originalStyle = element.style.cssText;
             element.style.width = '210mm';
             element.style.backgroundColor = '#ffffff';
-            element.style.position = 'relative';
-            element.style.padding = '20px';
             element.style.boxSizing = 'border-box';
 
+            // 捕获元素的自然渲染内容
             const canvas = await html2canvas(element, {
                 scale: scale,
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff',
                 logging: false,
-                width: element.scrollWidth,
-                height: element.scrollHeight,
                 imageTimeout: 0,
                 removeContainer: true,
             });
 
-            // Restore original style
+            // 恢复原始样式
             element.style.cssText = originalStyle;
 
-            // Check if generation was aborted or pdf was cleared during async capture
+            // 检查生成是否已被中止
             if (!pdfRef.current || abortRef.current) return false;
 
-            const imgData = canvas.toDataURL('image/jpeg', isLargeDocument ? 0.85 : 0.92);
+            // ========================================================
+            // 核心：创建精确 A4 比例（210:297）的画布
+            // 这确保每张图像与 PDF 页面比例完全匹配，杜绝空白页
+            // ========================================================
+            const A4_RATIO = 297 / 210; // ≈ 1.4143
+            const targetWidth = canvas.width;
+            const targetHeight = Math.round(targetWidth * A4_RATIO);
+
+            const a4Canvas = document.createElement('canvas');
+            a4Canvas.width = targetWidth;
+            a4Canvas.height = targetHeight;
+            const ctx = a4Canvas.getContext('2d');
+
+            if (!ctx) {
+                console.error('[PDF] 无法创建 canvas 2d 上下文');
+                return false;
+            }
+
+            // 先用白色填满整个 A4 画布
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+            if (canvas.height <= targetHeight) {
+                // 内容高度 ≤ A4 高度：直接绘制在顶部，底部保留白色
+                ctx.drawImage(canvas, 0, 0);
+            } else {
+                // 内容高度 > A4 高度：等比缩放以适应 A4 页面
+                const fitScale = targetHeight / canvas.height;
+                const scaledWidth = Math.round(canvas.width * fitScale);
+                const offsetX = Math.round((targetWidth - scaledWidth) / 2);
+                ctx.drawImage(canvas, offsetX, 0, scaledWidth, targetHeight);
+            }
+
+            const imgData = a4Canvas.toDataURL('image/jpeg', jpegQuality);
 
             const pdf = pdfRef.current;
             const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -81,13 +112,8 @@ export function usePDFGenerator() {
                 pdf.addPage();
             }
 
-            // 将图像宽度缩放至 PDF 页面宽度，高度按比例自适应
-            // 不再使用居中放置策略，而是从页面顶部开始，避免出现空白页
-            const finalWidth = pdfWidth;
-            const finalHeight = (canvas.height / canvas.width) * pdfWidth;
-
-            // 从顶部开始放置图像，x = 0 水平居左对齐
-            pdf.addImage(imgData, 'JPEG', 0, 0, finalWidth, finalHeight);
+            // 图像完美填满整个 PDF 页面（画布已是 A4 比例，无变形无空白）
+            pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
             setProgress(prev => ({ ...prev, current: index + 1 }));
             return true;
@@ -153,25 +179,11 @@ export function usePDFGenerator() {
         });
 
         try {
-            // Step 3: Validate PDF content before saving
-            const pdfOutput = pdf.output('arraybuffer');
-            const bytes = new Uint8Array(pdfOutput);
-
-            const isValid = bytes.length > 4 &&
-                bytes[0] === 0x25 && bytes[1] === 0x50 &&
-                bytes[2] === 0x44 && bytes[3] === 0x46;
-
-            console.log(`[PDF] Validation: ${isValid ? 'PASS' : 'FAIL'}, Pages: ${pdf.getNumberOfPages()}, Size: ${(bytes.length / 1024).toFixed(1)}KB`);
-
-            if (!isValid) {
-                throw new Error("Invalid PDF content");
-            }
-
-            // Step 4: Use jsPDF native save - this correctly handles Chinese filenames
-            console.log(`[PDF] Saving via jsPDF.save("${finalFile}")...`);
+            // 直接保存 PDF（不调用 output() 预验证，避免潜在的 jsPDF 内部状态干扰）
+            console.log(`[PDF] 页数: ${pdf.getNumberOfPages()}, 正在保存: "${finalFile}"`);
             pdf.save(finalFile);
 
-            console.log(`[PDF] ✅ Download complete: "${finalFile}"`);
+            console.log(`[PDF] ✅ 下载完成: "${finalFile}"`);
             setProgress(prev => ({ ...prev, status: 'complete' }));
 
         } catch (error) {

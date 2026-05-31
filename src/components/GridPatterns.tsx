@@ -6,21 +6,23 @@ interface GridPatternProps extends SVGProps<SVGSVGElement> {
 
 /**
  * 创建网格线条的共享属性。
- * 同时通过内联 style 属性保证 html2canvas 在离屏渲染（PDF 导出）时
- * 能正确捕获虚线和颜色，而不是回退为默认的黑色实线。
+ *
+ * 关键设计决策：
+ * - 不使用 strokeDasharray（html2canvas 完全无法渲染虚线，会退化为实线）
+ * - 不使用 vectorEffect（html2canvas 不支持，会导致线条在缩放时变粗）
+ * - 改用 strokeWidth=0.5（相对于 100x100 viewBox，非常细）+ opacity=0.5（半透明）
+ * - 这样无论在屏幕预览还是 PDF 导出中，格线都呈现为干净淡雅的细导线
  */
 const createSharedProps = (gridColor?: string) => {
   const color = gridColor || "#d1d5db";
   return {
     stroke: color,
-    strokeWidth: 1,
-    strokeDasharray: "2 2",
-    vectorEffect: "non-scaling-stroke" as const,
-    // 内联 style 确保 html2canvas 正确解析颜色和虚线
+    strokeWidth: 0.5,
+    opacity: 0.5,
     style: {
       stroke: color,
-      strokeWidth: 1,
-      strokeDasharray: "2 2",
+      strokeWidth: 0.5,
+      opacity: 0.5,
     },
   };
 };
@@ -57,4 +59,3 @@ export const HuiGongGe = ({ gridColor, ...props }: GridPatternProps) => {
     </svg>
   );
 };
-

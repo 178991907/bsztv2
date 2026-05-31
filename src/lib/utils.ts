@@ -76,8 +76,8 @@ export const calculatePageLayout = (
 ): PageLayoutResult => {
   if (uniqueChars.length === 0) return { canFitInOnePage: false, pages: [] };
 
-  // 限制 A4 纸张页面可用高度为 265mm（总高 297mm，除去页眉页脚及上下边距）
-  const MAX_PAGE_HEIGHT = 265;
+  // A4 纸张页面可用内容高度（总高 297mm 减去页眉、上下内边距和安全余量）
+  const MAX_PAGE_HEIGHT = 250;
   // 相邻汉字块之间的 CSS 垂直间隙物理高度（如 space-y-6 约为 6mm）
   const SPACE_GAP = 6;
 
