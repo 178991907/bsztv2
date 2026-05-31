@@ -98,7 +98,8 @@ function TracingCharacterGridComponent({
               // Mode 1: Render the full character for tracing (仅使用描字颜色)
               <path
                 d={strokes.join(' ')}
-                fill={tracingColor + "40"}  // 使用描字颜色加透明度
+                fill={tracingColor}          // 使用描字颜色
+                fillOpacity={0.25}           // 使用原生的 fillOpacity 透明度声明，解决 html2canvas 无法解析 8 位 hex 的兼容性大坑
                 className="tracing-char"
               />
             ) : isExample ? (
@@ -115,7 +116,8 @@ function TracingCharacterGridComponent({
                   <path
                     key={`base-${i}`}
                     d={stroke}
-                    fill={tracingColor + "20"}  // 使用描字颜色的淡版本作为底线
+                    fill={tracingColor}      // 使用描字颜色作为底色
+                    fillOpacity={0.12}       // 用原生的 fillOpacity 代替 8 位 hex，防 PDF 导出色彩异常
                   />
                 ))}
                 {/* Completed strokes - 使用完成笔顺颜色 */}
