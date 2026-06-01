@@ -1,4 +1,5 @@
 import type { SVGProps } from "react";
+import { cn } from "@/lib/utils";
 
 interface GridPatternProps extends SVGProps<SVGSVGElement> {
   gridColor?: string;
@@ -159,50 +160,49 @@ const renderDashedRect = (x: number, y: number, width: number, height: number, c
   return segments;
 };
 
-export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {
+export const TianZiGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 使用 rgba 格式，以确保 html2canvas 正确渲染透明度，避免黑色实线
-  const midColor = hexToRgba(color, 0.55); // 中线透明度提升至 0.55，更加清晰
+  // 所有格子类型统一使用 0.5 透明度，确保田/米/回三者在相同颜色下看起来一致
+  const lineColor = hexToRgba(color, 0.5);
   const strokeWidth = 0.5;
 
   return (
-    <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {renderHorizontalDashedLine(50, midColor, strokeWidth)}
-      {renderVerticalDashedLine(50, midColor, strokeWidth)}
+    <svg viewBox="0 0 100 100" {...props} className={cn(className, "grid-line")}>
+      {renderHorizontalDashedLine(50, lineColor, strokeWidth)}
+      {renderVerticalDashedLine(50, lineColor, strokeWidth)}
     </svg>
   );
 };
 
-export const MiZiGe = ({ gridColor, ...props }: GridPatternProps) => {
+export const MiZiGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 中线提升至 0.55，斜线提升至 0.38，兼顾层次感与屏幕可视度，彻底杜绝几乎“隐形”的尴尬
-  const midColor = hexToRgba(color, 0.55);
-  const diagColor = hexToRgba(color, 0.38);
+  // 所有线条（十字和对角）统一使用相同颜色，仅通过线宽区分层次感
+  // 这彻底杜绝了打印时"斜线比十字线黑一截"的突兀色差问题
+  const lineColor = hexToRgba(color, 0.5);
   const strokeWidth = 0.5;
-  const diagStrokeWidth = 0.4;
+  const diagStrokeWidth = 0.35; // 对角线略细以区分层次，颜色完全一致
 
   return (
-    <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {renderHorizontalDashedLine(50, midColor, strokeWidth)}
-      {renderVerticalDashedLine(50, midColor, strokeWidth)}
-      {renderMainDiagonalDashedLine(diagColor, diagStrokeWidth)}
-      {renderAntiDiagonalDashedLine(diagColor, diagStrokeWidth)}
+    <svg viewBox="0 0 100 100" {...props} className={cn(className, "grid-line")}>
+      {renderHorizontalDashedLine(50, lineColor, strokeWidth)}
+      {renderVerticalDashedLine(50, lineColor, strokeWidth)}
+      {renderMainDiagonalDashedLine(lineColor, diagStrokeWidth)}
+      {renderAntiDiagonalDashedLine(lineColor, diagStrokeWidth)}
     </svg>
   );
 };
 
-export const HuiGongGe = ({ gridColor, ...props }: GridPatternProps) => {
+export const HuiGongGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 十字线提升至 0.55，内矩形框提升至 0.45
-  const midColor = hexToRgba(color, 0.55);
-  const rectColor = hexToRgba(color, 0.45);
+  // 十字线与内矩形框统一使用相同颜色
+  const lineColor = hexToRgba(color, 0.5);
   const strokeWidth = 0.5;
 
   return (
-    <svg viewBox="0 0 100 100" {...props} className="grid-line">
-      {renderDashedRect(15, 15, 70, 70, rectColor, strokeWidth)}
-      {renderHorizontalDashedLine(50, midColor, strokeWidth)}
-      {renderVerticalDashedLine(50, midColor, strokeWidth)}
+    <svg viewBox="0 0 100 100" {...props} className={cn(className, "grid-line")}>
+      {renderDashedRect(15, 15, 70, 70, lineColor, strokeWidth)}
+      {renderHorizontalDashedLine(50, lineColor, strokeWidth)}
+      {renderVerticalDashedLine(50, lineColor, strokeWidth)}
     </svg>
   );
 };

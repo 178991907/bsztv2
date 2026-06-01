@@ -162,9 +162,9 @@
 
   /* === 打印配色与可视度深度优化 === */
   
-  /* 1. 汉字描红底线增强：大幅提升打印时底字的清晰度，解决纸张打印出来太浅、看不清如何描红的痛点 */
+  /* 1. 汉字描红底线增强：大幅提升打印时底字的清晰度 */
   svg g path[fill*="20"] {
-    fill: #b3bac4 !important; /* 从原本的极淡灰色（20% 透明度）提升到清晰易读的印刷级中灰 */
+    fill: #b3bac4 !important;
   }
   
   /* 2. Tracing 模式下整字描红底色增强 */
@@ -172,24 +172,16 @@
     fill: #9ba4b0 !important;
   }
   
-  /* 3. 增强网格十字中线的打印清晰度（原为 0.55 透明度） */
-  .grid-line line[stroke*="0.55"] {
-    stroke: #868e96 !important; 
+  /* 3. 所有网格虚线统一使用同一个打印灰色，彻底杜绝田/米/回之间的色差 */
+  .grid-line line {
+    stroke: #9ca3af !important; /* gray-400: 在纸张上清晰可读且不会过深抢眼 */
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
   }
   
-  /* 4. 增强米字格对角斜线的打印清晰度（原为 0.38 透明度） */
-  .grid-line line[stroke*="0.38"] {
-    stroke: #adb5bd !important; 
-  }
-  
-  /* 5. 增强回宫格内矩形框的打印清晰度（原为 0.45 透明度） */
-  .grid-line line[stroke*="0.45"] {
-    stroke: #9ba4b0 !important; 
-  }
-  
-  /* 6. 拼音四线格横线加深 */
+  /* 4. 拼音四线格横线加深 */
   .h-8 > div.h-px[class*="absolute"] {
-    background-color: #7f8c8d !important; /* 使用更深的铅笔灰 */
+    background-color: #7f8c8d !important;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }
