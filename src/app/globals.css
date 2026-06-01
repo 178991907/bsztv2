@@ -167,23 +167,23 @@
     fill: #b3bac4 !important; /* 从原本的极淡灰色（20% 透明度）提升到清晰易读的印刷级中灰 */
   }
   
-  /* 2. Tracing 模式下整字描红底色增强（原为 40% 透明度） */
+  /* 2. Tracing 模式下整字描红底色增强 */
   svg g path[fill*="40"] {
     fill: #9ba4b0 !important;
   }
   
-  /* 3. 增强网格十字中线的打印清晰度（原为 0.35 透明度） */
-  .grid-line line[stroke*="0.35"] {
+  /* 3. 增强网格十字中线的打印清晰度（原为 0.55 透明度） */
+  .grid-line line[stroke*="0.55"] {
     stroke: #868e96 !important; 
   }
   
-  /* 4. 增强米字格对角斜线的打印清晰度（原为 0.18 透明度，打印时极易丢失） */
-  .grid-line line[stroke*="0.18"] {
+  /* 4. 增强米字格对角斜线的打印清晰度（原为 0.38 透明度） */
+  .grid-line line[stroke*="0.38"] {
     stroke: #adb5bd !important; 
   }
   
-  /* 5. 增强回宫格内矩形框的打印清晰度（原为 0.25 透明度） */
-  .grid-line line[stroke*="0.25"] {
+  /* 5. 增强回宫格内矩形框的打印清晰度（原为 0.45 透明度） */
+  .grid-line line[stroke*="0.45"] {
     stroke: #9ba4b0 !important; 
   }
   

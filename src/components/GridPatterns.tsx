@@ -162,7 +162,7 @@ const renderDashedRect = (x: number, y: number, width: number, height: number, c
 export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
   // 使用 rgba 格式，以确保 html2canvas 正确渲染透明度，避免黑色实线
-  const midColor = hexToRgba(color, 0.35); // 中线透明度 0.35，比较淡雅
+  const midColor = hexToRgba(color, 0.55); // 中线透明度提升至 0.55，更加清晰
   const strokeWidth = 0.5;
 
   return (
@@ -175,9 +175,9 @@ export const TianZiGe = ({ gridColor, ...props }: GridPatternProps) => {
 
 export const MiZiGe = ({ gridColor, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 中线用 0.35 透明度，斜线用更淡的 0.2 透明度，完美体现层次感，杜绝颜色不一致或堆叠混淆
-  const midColor = hexToRgba(color, 0.35);
-  const diagColor = hexToRgba(color, 0.18);
+  // 中线提升至 0.55，斜线提升至 0.38，兼顾层次感与屏幕可视度，彻底杜绝几乎“隐形”的尴尬
+  const midColor = hexToRgba(color, 0.55);
+  const diagColor = hexToRgba(color, 0.38);
   const strokeWidth = 0.5;
   const diagStrokeWidth = 0.4;
 
@@ -193,8 +193,9 @@ export const MiZiGe = ({ gridColor, ...props }: GridPatternProps) => {
 
 export const HuiGongGe = ({ gridColor, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  const midColor = hexToRgba(color, 0.35);
-  const rectColor = hexToRgba(color, 0.25);
+  // 十字线提升至 0.55，内矩形框提升至 0.45
+  const midColor = hexToRgba(color, 0.55);
+  const rectColor = hexToRgba(color, 0.45);
   const strokeWidth = 0.5;
 
   return (
