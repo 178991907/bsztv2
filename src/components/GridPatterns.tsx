@@ -152,7 +152,7 @@ const renderDashedRect = (x: number, y: number, width: number, height: number, c
     segments.push(<line key={`rect-l-${py}`} x1={x} y1={py} x2={x} y2={py2} stroke={color} strokeWidth={strokeWidth} />);
   }
   // 右边：x + width
-  for (let py = y; py < py + height; py += dashLength + gapLength) {
+  for (let py = y; py < y + height; py += dashLength + gapLength) {
     const py2 = Math.min(py + dashLength, y + height);
     segments.push(<line key={`rect-r-${py}`} x1={x + width} y1={py} x2={x + width} y2={py2} stroke={color} strokeWidth={strokeWidth} />);
   }
