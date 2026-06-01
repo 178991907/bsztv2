@@ -14,6 +14,7 @@ export interface Settings {
   tracingColor: string;  // 描字颜色（仅用于描红练习）
   strokeColor: string;  // 当前笔顺演示颜色
   completedStrokeColor: string;  // 完成笔顺颜色
+  selectedPinyins?: Record<string, string>; // 保存用户为每个汉字选择的拼音，例如：{ '行': 'háng' }
 }
 
 export const CharacterDetailsSchema = z.object({

@@ -76,7 +76,7 @@ export default function Home() {
           <SettingsPanel settings={settings} setSettings={setSettings} />
         </div>
         <div className="flex-1 flex justify-center items-start">
-          <WorksheetPreview settings={settings} />
+          <WorksheetPreview settings={settings} setSettings={setSettings} />
         </div>
       </main>
 

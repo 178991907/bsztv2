@@ -11,9 +11,30 @@ import { usePDFGenerator } from "@/hooks/usePDFGenerator";
 import { calculatePageLayout } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 
-export function WorksheetPreview({ settings }: { settings: Settings }) {
+export function WorksheetPreview({ settings, setSettings }: { settings: Settings; setSettings?: (settings: Settings) => void }) {
   const { characterDataMap, isLoading: isDataLoading, loadingProgress, uniqueChars, allCharsLoaded } = useCharacterData(settings.name);
   const { isDownloading, progress: pdfProgress, startPDF, capturePage, finishPDF, previewPDF, cancelGeneration } = usePDFGenerator();
+
+  // 获取汉字的当前拼音选择（如无手动选择，则采用第一个）
+  const getPinyinForChar = (char: string, details: any) => {
+    if (settings.selectedPinyins && settings.selectedPinyins[char]) {
+      return settings.selectedPinyins[char];
+    }
+    return details?.pinyin?.[0] || "";
+  };
+
+  // 用户点击切换拼音时的回调处理
+  const handlePinyinSelect = (char: string, pinyin: string) => {
+    if (setSettings) {
+      setSettings({
+        ...settings,
+        selectedPinyins: {
+          ...settings.selectedPinyins,
+          [char]: pinyin,
+        },
+      });
+    }
+  };
 
   const [renderingPageIndex, setRenderingPageIndex] = useState<number>(-1);
   const [showAllInPreview, setShowAllInPreview] = useState(false);
@@ -70,6 +91,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
     const strokeCount = strokes.length;
     const gridsPerRow = settings.gridCount;
     const tracingRows = Math.max(1, settings.tracingRows); // 至少重复一次
+    const activePinyin = getPinyinForChar(char, details);
 
     // 创建一个完整的笔顺练习序列（笔顺描红 + 灰色描摸字填充）
     const createStrokePracticeSequence = () => {
@@ -84,7 +106,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
             gridType={settings.gridType}
             highlightStroke={i}
             showPinyin={settings.showPinyin}
-            pinyin={details.pinyin[0]}
+            pinyin={activePinyin}
             gridColor={settings.gridColor}
             innerGridColor={settings.innerGridColor}
             characterColor={settings.characterColor}
@@ -116,7 +138,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
             gridType={settings.gridType}
             isTracing={true}
             showPinyin={settings.showPinyin}
-            pinyin={details.pinyin[0]}
+            pinyin={activePinyin}
             gridColor={settings.gridColor}
             innerGridColor={settings.innerGridColor}
             characterColor={settings.characterColor}
@@ -164,7 +186,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
               gridType={settings.gridType}
               isTracing={true}
               showPinyin={settings.showPinyin}
-              pinyin={details.pinyin[0]}
+              pinyin={activePinyin}
               gridColor={settings.gridColor}
               innerGridColor={settings.innerGridColor}
               characterColor={settings.characterColor}
@@ -392,7 +414,7 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
                           completedStrokeColor={settings.completedStrokeColor}
                         />
                         <div className="flex-1">
-                          <CharacterInfo details={details} strokeCount={strokes.length} />
+                          <CharacterInfo details={details} strokeCount={strokes.length} selectedPinyin={getPinyinForChar(char, details)} />
                         </div>
                       </div>
                       {renderPracticeSheet(char)}
@@ -449,7 +471,12 @@ export function WorksheetPreview({ settings }: { settings: Settings }) {
                               completedStrokeColor={settings.completedStrokeColor}
                             />
                             <div className="flex-1">
-                              <CharacterInfo details={details} strokeCount={strokeCount} />
+                              <CharacterInfo
+                                details={details}
+                                strokeCount={strokeCount}
+                                selectedPinyin={getPinyinForChar(char, details)}
+                                onPinyinSelect={(pinyin) => handlePinyinSelect(char, pinyin)}
+                              />
                             </div>
                           </div>
                           {renderPracticeSheet(char)}
