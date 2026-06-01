@@ -160,21 +160,36 @@
     margin-top: auto !important; /* 弹性贴底：内容少时自动靠到底部，超长时自适应，绝不发生溢出 */
   }
 
-  .tracing-char {
-    color: #d1d5db !important; /* gray-300 */
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
+  /* === 打印配色与可视度深度优化 === */
+  
+  /* 1. 汉字描红底线增强：大幅提升打印时底字的清晰度，解决纸张打印出来太浅、看不清如何描红的痛点 */
+  svg g path[fill*="20"] {
+    fill: #b3bac4 !important; /* 从原本的极淡灰色（20% 透明度）提升到清晰易读的印刷级中灰 */
   }
   
-  .grid-line {
-    stroke: #d1d5db !important; /* gray-300 */
-    -webkit-print-color-adjust: exact;
-    color-adjust: exact;
+  /* 2. Tracing 模式下整字描红底色增强（原为 40% 透明度） */
+  svg g path[fill*="40"] {
+    fill: #9ba4b0 !important;
   }
   
-  /* 确保拼音四线格在打印时可见 - 仅针对线条 (h-px) */
+  /* 3. 增强网格十字中线的打印清晰度（原为 0.35 透明度） */
+  .grid-line line[stroke*="0.35"] {
+    stroke: #868e96 !important; 
+  }
+  
+  /* 4. 增强米字格对角斜线的打印清晰度（原为 0.18 透明度，打印时极易丢失） */
+  .grid-line line[stroke*="0.18"] {
+    stroke: #adb5bd !important; 
+  }
+  
+  /* 5. 增强回宫格内矩形框的打印清晰度（原为 0.25 透明度） */
+  .grid-line line[stroke*="0.25"] {
+    stroke: #9ba4b0 !important; 
+  }
+  
+  /* 6. 拼音四线格横线加深 */
   .h-8 > div.h-px[class*="absolute"] {
-    background-color: #9ca3af !important; /* gray-400 */
+    background-color: #7f8c8d !important; /* 使用更深的铅笔灰 */
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
   }

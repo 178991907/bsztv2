@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 
 interface SettingsPanelProps {
@@ -53,25 +52,48 @@ export function SettingsPanel({ settings, setSettings }: SettingsPanelProps) {
         </div>
 
         <div className="space-y-2">
-          <Label>格子类型</Label>
-          <RadioGroup
-            value={settings.gridType}
-            onValueChange={(value) => setSettings({ ...settings, gridType: value as any })}
-            className="flex space-x-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="tian-zi-ge" id="tian-zi-ge" />
-              <Label htmlFor="tian-zi-ge">田字格</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="mi-zi-ge" id="mi-zi-ge" />
-              <Label htmlFor="mi-zi-ge">米字格</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="hui-gong-ge" id="hui-gong-ge" />
-              <Label htmlFor="hui-gong-ge">回宫格</Label>
-            </div>
-          </RadioGroup>
+          <Label className="text-sm font-bold">格子类型</Label>
+          <div className="flex items-center space-x-6 py-1 select-none">
+            <label className="flex items-center space-x-2 cursor-pointer group">
+              <input
+                type="radio"
+                name="gridType"
+                value="tian-zi-ge"
+                checked={settings.gridType === "tian-zi-ge"}
+                onChange={() => setSettings({ ...settings, gridType: "tian-zi-ge" })}
+                className="w-4 h-4 text-primary border-primary focus:ring-primary cursor-pointer accent-primary transition-all scale-105"
+              />
+              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                田字格
+              </span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer group">
+              <input
+                type="radio"
+                name="gridType"
+                value="mi-zi-ge"
+                checked={settings.gridType === "mi-zi-ge"}
+                onChange={() => setSettings({ ...settings, gridType: "mi-zi-ge" })}
+                className="w-4 h-4 text-primary border-primary focus:ring-primary cursor-pointer accent-primary transition-all scale-105"
+              />
+              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                米字格
+              </span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer group">
+              <input
+                type="radio"
+                name="gridType"
+                value="hui-gong-ge"
+                checked={settings.gridType === "hui-gong-ge"}
+                onChange={() => setSettings({ ...settings, gridType: "hui-gong-ge" })}
+                className="w-4 h-4 text-primary border-primary focus:ring-primary cursor-pointer accent-primary transition-all scale-105"
+              />
+              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                回宫格
+              </span>
+            </label>
+          </div>
         </div>
 
         <div className="flex items-center justify-between">
