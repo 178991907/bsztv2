@@ -162,8 +162,8 @@ const renderDashedRect = (x: number, y: number, width: number, height: number, c
 
 export const TianZiGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 所有格子类型统一使用 0.5 透明度，确保田/米/回三者在相同颜色下看起来一致
-  const lineColor = hexToRgba(color, 0.5);
+  // 屏幕上使用 0.85 的不透明度，确保小尺寸下对角线和矩形虚线清晰可见，且完美支持用户自定义色彩展现
+  const lineColor = hexToRgba(color, 0.85);
   const strokeWidth = 0.5;
 
   return (
@@ -176,11 +176,10 @@ export const TianZiGe = ({ gridColor, className, ...props }: GridPatternProps) =
 
 export const MiZiGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 所有线条（十字和对角）统一使用相同颜色，仅通过线宽区分层次感
-  // 这彻底杜绝了打印时"斜线比十字线黑一截"的突兀色差问题
-  const lineColor = hexToRgba(color, 0.5);
+  // 屏幕上使用 0.85 的不透明度，确保小尺寸下对角线和矩形虚线清晰可见，且完美支持用户自定义色彩展现
+  const lineColor = hexToRgba(color, 0.85);
   const strokeWidth = 0.5;
-  const diagStrokeWidth = 0.35; // 对角线略细以区分层次，颜色完全一致
+  const diagStrokeWidth = 0.4; // 微调对角线粗度为 0.4，确保次像素抗锯齿下屏幕完美可见
 
   return (
     <svg viewBox="0 0 100 100" {...props} className={cn(className, "grid-line")}>
@@ -194,8 +193,8 @@ export const MiZiGe = ({ gridColor, className, ...props }: GridPatternProps) => 
 
 export const HuiGongGe = ({ gridColor, className, ...props }: GridPatternProps) => {
   const color = gridColor || "#d1d5db";
-  // 十字线与内矩形框统一使用相同颜色
-  const lineColor = hexToRgba(color, 0.5);
+  // 屏幕上使用 0.85 的不透明度，确保小尺寸下对角线和矩形虚线清晰可见，且完美支持用户自定义色彩展现
+  const lineColor = hexToRgba(color, 0.85);
   const strokeWidth = 0.5;
 
   return (
