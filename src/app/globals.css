@@ -71,10 +71,29 @@
 }
 
 @media print {
+  /* 确保打印时所有外层容器和页面高度均撑满 100%，并保持背景纯白，防止因高度不足露出外层灰底 */
+  html,
   body {
-    background-color: #fff !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
     -webkit-print-color-adjust: exact;
     color-adjust: exact;
+  }
+  
+  div.min-h-screen,
+  main,
+  #printable-area,
+  .printable-area,
+  .character-pages {
+    height: 100% !important;
+    min-height: 100% !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   
   .no-print {
@@ -98,8 +117,8 @@
   
   .character-page {
     width: 100% !important;
-    height: auto !important; /* 彻底自适应内容，绝不写死高度，杜绝因物理边距导致溢出产生空白页 */
-    min-height: 0 !important;
+    height: auto !important; /* 彻底自适应内容，防止死板高度导致多余空白页 */
+    min-height: 100% !important; /* 强制撑满一整页 A4 纸的高度，避免打印预览被切断并露出灰色底 */
     padding: 0 !important;
     margin: 0 !important;
     border: none !important;
